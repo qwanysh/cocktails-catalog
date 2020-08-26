@@ -54,7 +54,7 @@ const renderCocktails = cocktails => {
 const renderCocktail = cocktail => {
   const cocktailContainer = $('#cocktailsContainer');
 
-  const cocktailCard = $('<div class="col-4">');
+  const cocktailCard = $('<div class="col-12 col-md-6 col-lg-4">');
   cocktailCard.html(`
     <div class="card mb-2">
       <img src="${cocktail.strDrinkThumb}" class="card-img-top" alt="${cocktail.strDrink}">
