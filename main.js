@@ -76,16 +76,23 @@ const showDetailModal = cocktail => {
 
   const ingredients = getIngredientsOfCocktail(cocktail);
 
-  const ingredientsHtml = ingredients.map((ingredient) => {
+  const ingredientsHtml = ingredients.map((ingredient, index) => {
     return `
-      <li class="media">
-        <img src="${ingredient.imageUrl}" class="mr-3" alt="${ingredient.name}" style="width: 10%">
-        <div class="media-body">
-          <a href="#" class="searchLinkIngredient" data-ingredient-name="${ingredient.name}">
+      <div class="card mb-2">
+        <div class="card-header d-flex align-items-center searchLinkIngredient" 
+            data-ingredient-name="${ingredient.name}" 
+            id="heading${index}" data-toggle="collapse" 
+            data-target="#collapse${index}" 
+            aria-expanded="false">
+          <img src="${ingredient.imageUrl}" class="mr-3" alt="${ingredient.name}" style="width: 10%">
+          <div class="media-body">
             <h5 class="mt-0 mb-1">${ingredient.name}${ingredient.measure ? ` (${ingredient.measure})` : ''}</h5>
-          </a>
+          </div>
         </div>
-      </li>
+        <div id="collapse${index}" class="collapse" aria-labelledby="headingOne">
+          <div class="card-body"></div>
+        </div>
+      </div>
     `;
   }).join('');
 
@@ -114,14 +121,45 @@ const showDetailModal = cocktail => {
     </div>
   `);
 
-  detailModal.find('.searchLinkIngredient').on('click', function () {
-    const ingredientName = $(this).attr('data-ingredient-name');
-    searchCocktailsByIngredient(ingredientName);
-  });
+  detailModal.find('.searchLinkIngredient').on('click', renderIngredientDetails);
 
   $('body').append(detailModal);
   detailModal.modal();
 };
+
+function renderIngredientDetails() {
+  const ingredientName = $(this).attr('data-ingredient-name');
+  const detailContainer = $(this).next().find('.card-body');
+  const url = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?' + `i=${ingredientName}`;
+
+  fetch(url).then(response => {
+    return response.json();
+  }).then(response => {
+    const ingredient = response.ingredients[0];
+    const properties = ['Ingredient', 'Description', 'Type', 'Alcohol', 'ABV'];
+    let detailHtml = '';
+
+    for (const property of properties) {
+      const propertyValue = ingredient[`str${property}`];
+      if (propertyValue) {
+        detailHtml += `
+          <h5>${property}:</h5>
+          <p>${propertyValue}</p>
+        `;
+      }
+    }
+
+    detailContainer.html(detailHtml);
+
+    const searchByIngredientButton = $(
+      '<button class="btn btn-primary">Search cocktails with this ingredient</button>'
+    ).on('click', () => {
+      searchCocktailsByIngredient(ingredientName);
+    });
+
+    detailContainer.append(searchByIngredientButton);
+  });
+}
 
 const getIngredientsOfCocktail = cocktail => {
   const ingredients = [];
