@@ -10,8 +10,23 @@ $('#searchButtonName').on('click', function (event) {
 
 $('#searchButtonIngredient').on('click', function (event) {
   event.preventDefault();
-  const cocktailIngredient = $('#cocktailIngredient').val();
-  const url = 'https://www.thecocktaildb.com/api/json/v1/1/filter.php?' + `i=${cocktailIngredient}`;
+  const ingredientName = $('#ingredientName').val();
+
+  searchCocktailsByIngredient(ingredientName);
+});
+
+const searchCocktailsByName = cocktailName => {
+  const url = BASE_URL + `s=${cocktailName}`;
+
+  fetch(url).then(response => {
+    return response.json();
+  }).then(response => {
+    renderCocktails(response.drinks);
+  });
+};
+
+const searchCocktailsByIngredient = ingredientName => {
+  const url = 'https://www.thecocktaildb.com/api/json/v1/1/filter.php?' + `i=${ingredientName}`;
 
   fetch(url).then(response => {
     return response.json();
@@ -22,16 +37,6 @@ $('#searchButtonIngredient').on('click', function (event) {
     for (const cocktailName of cocktailNames) {
       searchCocktailsByName(cocktailName);
     }
-  });
-});
-
-const searchCocktailsByName = cocktailName => {
-  const url = BASE_URL + `s=${cocktailName}`;
-
-  fetch(url).then(response => {
-    return response.json();
-  }).then(response => {
-    renderCocktails(response.drinks);
   });
 };
 
@@ -76,11 +81,13 @@ const showDetailModal = cocktail => {
       <li class="media">
         <img src="${ingredient.imageUrl}" class="mr-3" alt="${ingredient.name}" style="width: 10%">
         <div class="media-body">
-          <h5 class="mt-0 mb-1">${ingredient.name}${ingredient.measure ? ` (${ingredient.measure})` : ''}</h5>
+          <a href="#" class="searchLinkIngredient" data-ingredient-name="${ingredient.name}">
+            <h5 class="mt-0 mb-1">${ingredient.name}${ingredient.measure ? ` (${ingredient.measure})` : ''}</h5>
+          </a>
         </div>
       </li>
     `;
-  });
+  }).join('');
 
   detailModal.html(`
     <div class="modal-dialog">
@@ -93,9 +100,7 @@ const showDetailModal = cocktail => {
         </div>
         <div class="modal-body">
           <h5>Ingredients:</h5>
-          <ul class="list-unstyled">
-            ${ingredientsHtml.join('')}
-          </ul>
+          <ul class="list-unstyled">${ingredientsHtml}</ul>
           <h5>Instructions:</h5>
           <p>${cocktail.strInstructions}</p>
           <h5>Glass:</h5>
@@ -108,6 +113,11 @@ const showDetailModal = cocktail => {
       </div>
     </div>
   `);
+
+  detailModal.find('.searchLinkIngredient').on('click', function () {
+    const ingredientName = $(this).attr('data-ingredient-name');
+    searchCocktailsByIngredient(ingredientName);
+  });
 
   $('body').append(detailModal);
   detailModal.modal();
