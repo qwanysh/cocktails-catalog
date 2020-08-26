@@ -1,4 +1,4 @@
-const BASE_URL = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?';
+const BASE_URL = 'https://www.thecocktaildb.com/api/json/v1/1/';
 
 $('#searchButtonName').on('click', function (event) {
   event.preventDefault();
@@ -16,7 +16,7 @@ $('#searchButtonIngredient').on('click', function (event) {
 });
 
 const searchCocktailsByName = cocktailName => {
-  const url = BASE_URL + `s=${cocktailName}`;
+  const url = BASE_URL + `search.php?s=${cocktailName}`;
 
   fetch(url).then(response => {
     return response.json();
@@ -26,7 +26,7 @@ const searchCocktailsByName = cocktailName => {
 };
 
 const searchCocktailsByIngredient = ingredientName => {
-  const url = 'https://www.thecocktaildb.com/api/json/v1/1/filter.php?' + `i=${ingredientName}`;
+  const url = BASE_URL + `filter.php?i=${ingredientName}`;
 
   fetch(url).then(response => {
     return response.json();
@@ -130,7 +130,7 @@ const showDetailModal = cocktail => {
 function renderIngredientDetails() {
   const ingredientName = $(this).attr('data-ingredient-name');
   const detailContainer = $(this).next().find('.card-body');
-  const url = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?' + `i=${ingredientName}`;
+  const url = BASE_URL + `search.php?i=${ingredientName}`;
 
   fetch(url).then(response => {
     return response.json();
