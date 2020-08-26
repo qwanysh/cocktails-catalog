@@ -1,9 +1,9 @@
-const DOMAIN = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?';
+const BASE_URL = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?';
 
 $('#searchButton').on('click', function (event) {
   event.preventDefault();
   const cocktailName = $('#cocktailName').val();
-  const url = DOMAIN + `s=${cocktailName}`;
+  const url = BASE_URL + `s=${cocktailName}`;
 
   fetch(url).then(response => {
     return response.json();
@@ -73,6 +73,12 @@ const showDetailModal = cocktail => {
           </ul>
           <h5>Instructions:</h5>
           <p>${cocktail.strInstructions}</p>
+          <h5>Glass:</h5>
+          <p>${cocktail.strGlass}</p>
+          <h5>Is alhocolic:</h5>
+          <p>${cocktail.strAlcoholic.toLowerCase() === 'alcoholic' ? 'Yes' : 'No'}</p>
+          <h5>Category:</h5>
+          <p>${cocktail.strCategory}</p>
         </div>
       </div>
     </div>
