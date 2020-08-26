@@ -1,8 +1,31 @@
 const BASE_URL = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?';
 
-$('#searchButton').on('click', function (event) {
+$('#searchButtonName').on('click', function (event) {
   event.preventDefault();
   const cocktailName = $('#cocktailName').val();
+
+  clearContainer();
+  searchCocktailsByName(cocktailName);
+});
+
+$('#searchButtonIngredient').on('click', function (event) {
+  event.preventDefault();
+  const cocktailIngredient = $('#cocktailIngredient').val();
+  const url = 'https://www.thecocktaildb.com/api/json/v1/1/filter.php?' + `i=${cocktailIngredient}`;
+
+  fetch(url).then(response => {
+    return response.json();
+  }).then(response => {
+    return response.drinks.map(drink => drink.strDrink);
+  }).then(cocktailNames => {
+    clearContainer();
+    for (const cocktailName of cocktailNames) {
+      searchCocktailsByName(cocktailName);
+    }
+  });
+});
+
+const searchCocktailsByName = cocktailName => {
   const url = BASE_URL + `s=${cocktailName}`;
 
   fetch(url).then(response => {
@@ -10,12 +33,14 @@ $('#searchButton').on('click', function (event) {
   }).then(response => {
     renderCocktails(response.drinks);
   });
-});
+};
 
-const renderCocktails = cocktails => {
+const clearContainer = () => {
   const cocktailContainer = $('#cocktailsContainer');
   cocktailContainer.html('');
+};
 
+const renderCocktails = cocktails => {
   for (const cocktail of cocktails) {
     renderCocktail(cocktail);
   }
@@ -26,7 +51,7 @@ const renderCocktail = cocktail => {
 
   const cocktailCard = $('<div class="col-4">');
   cocktailCard.html(`
-    <div class="card">
+    <div class="card mb-2">
       <img src="${cocktail.strDrinkThumb}" class="card-img-top" alt="${cocktail.strDrink}">
       <div class="card-body">
       <h5 class="card-title">${cocktail.strDrink}</h5>
